@@ -27,5 +27,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     // libraries
-    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'fr.smartapps.library:lib_smalistview:1.0.0'
+    compile 'fr.smartapps.library:lib_smaassetmanager:1.0.14'
+    compile 'fr.smartapps.library:lib_smadialog:1.0.4'
+    compile 'fr.smartapps.library:lib_sma-packagemanager:1.0.11'
+    compile 'fr.smartapps.library:lib_sma-support-v1:1.0.1'
 }
