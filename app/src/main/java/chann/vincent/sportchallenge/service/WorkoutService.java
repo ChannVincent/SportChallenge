@@ -15,6 +15,7 @@ public class WorkoutService extends Service {
 
     private String TAG = "WorkoutService";
     protected WorkoutBinder workoutBinder = new WorkoutBinder();
+    protected WorkoutServiceListener listener = null;
 
     @Override
     public void onCreate() {
@@ -52,11 +53,26 @@ public class WorkoutService extends Service {
         return workoutBinder;
     }
 
+    protected int stack1 = 0;
     public void startAction1() {
         Toast.makeText(this, "WorkoutService - action1", Toast.LENGTH_SHORT).show();
+        if (listener != null) {
+            stack1++;
+            listener.triggerAction1("stack action 1 : " + stack1);
+        }
     }
+
+    protected int stack2 = 0;
     public void startAction2() {
         Toast.makeText(this, "WorkoutService - action2", Toast.LENGTH_SHORT).show();
+        if (listener != null) {
+            stack2++;
+            listener.triggerAction2("stack action 2 : " + stack2);
+        }
+    }
+
+    public void setListener(WorkoutServiceListener listener) {
+        this.listener = listener;
     }
 
     public class WorkoutBinder extends Binder {
