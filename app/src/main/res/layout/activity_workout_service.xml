@@ -39,4 +39,10 @@
         android:layout_height="wrap_content"
         android:text="output trigger 2" />
 
+    <Button
+        android:text="STOP SERVICE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onStart7" />
+
 </LinearLayout>

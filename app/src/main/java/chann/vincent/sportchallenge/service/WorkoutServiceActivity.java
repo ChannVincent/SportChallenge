@@ -17,6 +17,7 @@ public class WorkoutServiceActivity extends AppCompatActivity {
 
     private String TAG = "WorkoutIntentActivity";
     protected WorkoutService workoutService = null;
+    protected Intent intentWorkoutService = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +30,7 @@ public class WorkoutServiceActivity extends AppCompatActivity {
      */
     public void onStart4(View view) {
         Toast.makeText(this, "Start service", Toast.LENGTH_SHORT).show();
-        Intent intentWorkoutService = new Intent(this, WorkoutService.class);
+        intentWorkoutService = new Intent(this, WorkoutService.class);
         startService(intentWorkoutService);
         bindService(intentWorkoutService, new ServiceConnection() {
             @Override
@@ -80,5 +81,15 @@ public class WorkoutServiceActivity extends AppCompatActivity {
             return;
         }
         workoutService.startAction2();
+    }
+
+    /*
+    Stop Workout Service
+     */
+    public void onStart7(View view) {
+        if (workoutService == null) {
+            return;
+        }
+        workoutService.stopService();
     }
 }
