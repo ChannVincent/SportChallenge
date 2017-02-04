@@ -20,7 +20,6 @@ import chann.vincent.sportchallenge.service.WorkoutService;
 public class WorkoutServiceActivity extends AppCompatActivity {
 
     private String TAG = "WorkoutIntentActivity";
-    protected Intent intentWorkoutService = null;
     protected WorkoutService workoutService = null;
 
     @Override
@@ -32,19 +31,16 @@ public class WorkoutServiceActivity extends AppCompatActivity {
     /*
     Workout Service
      */
-    protected void bindWorkoutService() {
-        if (intentWorkoutService == null) {
-            Log.e(TAG, "intentWorkoutService is null");
-            return;
-        }
-
+    public void onStart4(View view) {
+        Toast.makeText(this, "Start service", Toast.LENGTH_SHORT).show();
+        Intent intentWorkoutService = new Intent(this, WorkoutService.class);
+        startService(intentWorkoutService);
         bindService(intentWorkoutService, new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 WorkoutService.WorkoutBinder workoutBinder = (WorkoutService.WorkoutBinder) iBinder;
                 workoutService = workoutBinder.getService();
             }
-
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
 
@@ -52,21 +48,17 @@ public class WorkoutServiceActivity extends AppCompatActivity {
         }, Context.BIND_AUTO_CREATE);
     }
 
-    public void onStart4(View view) {
-        Toast.makeText(this, "Start service", Toast.LENGTH_SHORT).show();
-        intentWorkoutService = new Intent(this, WorkoutService.class);
-        startService(intentWorkoutService);
-    }
-
     public void onStart5(View view) {
-        Toast.makeText(this, "Bind service", Toast.LENGTH_SHORT).show();
-        bindWorkoutService();
+        if (workoutService == null) {
+            return;
+        }
+        workoutService.startAction1();
     }
 
     public void onStart6(View view) {
         if (workoutService == null) {
             return;
         }
-        workoutService.startAction1();
+        workoutService.startAction2();
     }
 }

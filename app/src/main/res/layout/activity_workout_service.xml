@@ -16,13 +16,13 @@
         android:onClick="onStart4" />
 
     <Button
-        android:text="BIND SERVICE"
+        android:text="START ACTION 1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onStart5" />
 
     <Button
-        android:text="START ACTION"
+        android:text="START ACTION 2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onStart6" />
