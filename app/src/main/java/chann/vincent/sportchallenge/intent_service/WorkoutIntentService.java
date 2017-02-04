@@ -1,13 +1,9 @@
-package chann.vincent.sportchallenge.service;
+package chann.vincent.sportchallenge.intent_service;
 
 import android.app.IntentService;
-import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
-
-import chann.vincent.sportchallenge.MainActivity;
 
 /**
  * Created by vincentchann on 03/02/2017.
@@ -16,7 +12,7 @@ import chann.vincent.sportchallenge.MainActivity;
 public class WorkoutIntentService extends IntentService {
 
     static private String TAG = "WorkoutIntentService";
-    public static final String ACTION_RESP = "chann.vincent.sportchallenge.service.WorkoutIntentService";
+    public static final String ACTION_RESP = "chann.vincent.sportchallenge.intent_service.WorkoutIntentService";
 
     public WorkoutIntentService() {
         super(TAG);

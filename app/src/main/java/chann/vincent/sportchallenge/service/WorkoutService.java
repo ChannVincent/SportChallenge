@@ -2,8 +2,10 @@ package chann.vincent.sportchallenge.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by vincentchann on 03/02/2017.
@@ -12,7 +14,7 @@ import android.util.Log;
 public class WorkoutService extends Service {
 
     private String TAG = "WorkoutService";
-    public static final String ACTION_RESP = "chann.vincent.sportchallenge.service.WorkoutService";
+    protected WorkoutBinder workoutBinder = new WorkoutBinder();
 
     @Override
     public void onCreate() {
@@ -22,12 +24,7 @@ public class WorkoutService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "onStartCommand() " + intent.getAction());
-
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(ACTION_RESP);
-        sendBroadcast(broadcastIntent);
-
+        Log.e(TAG, "onStartCommand()");
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -39,19 +36,32 @@ public class WorkoutService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.e(TAG, "onUnbind() " + intent.getAction());
+        Log.e(TAG, "onUnbind()");
         return super.onUnbind(intent);
     }
 
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        Log.e(TAG, "onRebind() " + intent.getAction());
+        Log.e(TAG, "onRebind()");
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e(TAG, "onBind() " + intent.getAction());
-        return null;
+        Log.e(TAG, "onBind()");
+        return workoutBinder;
+    }
+
+    public void startAction1() {
+        Toast.makeText(this, "WorkoutService - action1", Toast.LENGTH_SHORT).show();
+    }
+    public void startAction2() {
+        Toast.makeText(this, "WorkoutService - action2", Toast.LENGTH_SHORT).show();
+    }
+
+    public class WorkoutBinder extends Binder {
+        public WorkoutService getService() {
+            return WorkoutService.this;
+        }
     }
 }

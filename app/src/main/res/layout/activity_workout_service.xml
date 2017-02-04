@@ -7,30 +7,6 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Workout Intent Service" />
-
-    <Button
-        android:text="START INTENT SERVICE"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onStart1"/>
-<!--
-    <Button
-        android:text="BIND INTENT SERVICE"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onStart2" />
-
-    <Button
-        android:text="DESTROY INTENT SERVICE"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onStart3" />
--->
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="Workout Service" />
 
     <Button
@@ -38,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onStart4" />
-    <!--
+
     <Button
         android:text="BIND SERVICE"
         android:layout_width="wrap_content"
@@ -46,9 +22,9 @@
         android:onClick="onStart5" />
 
     <Button
-        android:text="DESTROY SERVICE"
+        android:text="START ACTION"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onStart6" />
--->
+
 </LinearLayout>
