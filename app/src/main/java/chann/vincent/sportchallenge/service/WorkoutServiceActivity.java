@@ -1,5 +1,4 @@
 package chann.vincent.sportchallenge.service;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +30,7 @@ public class WorkoutServiceActivity extends AppCompatActivity {
     public void onStart4(View view) {
         Toast.makeText(this, "Start service", Toast.LENGTH_SHORT).show();
         intentWorkoutService = new Intent(this, WorkoutService.class);
+        intentWorkoutService.setAction(Constants.ACTION.START_FOREGROUND_ACTION);
         startService(intentWorkoutService);
         bindService(intentWorkoutService, new ServiceConnection() {
             @Override
@@ -54,42 +54,39 @@ public class WorkoutServiceActivity extends AppCompatActivity {
                     });
                 }
             }
+
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
 
             }
         }, Context.BIND_AUTO_CREATE);
-
-
     }
 
     /*
     Start action 1 of Workout Service
      */
     public void onStart5(View view) {
-        if (workoutService == null) {
-            return;
-        }
-        workoutService.startAction1();
+        intentWorkoutService = new Intent(this, WorkoutService.class);
+        intentWorkoutService.setAction(Constants.ACTION.PREV_ACTION);
+        startService(intentWorkoutService);
     }
 
     /*
     Start action 2 of Workout Service
      */
     public void onStart6(View view) {
-        if (workoutService == null) {
-            return;
-        }
-        workoutService.startAction2();
+        intentWorkoutService = new Intent(this, WorkoutService.class);
+        intentWorkoutService.setAction(Constants.ACTION.PLAY_ACTION);
+        startService(intentWorkoutService);
     }
 
     /*
     Stop Workout Service
      */
     public void onStart7(View view) {
-        if (workoutService == null) {
-            return;
-        }
-        workoutService.stopService();
+        Toast.makeText(this, "Stop service", Toast.LENGTH_SHORT).show();
+        intentWorkoutService = new Intent(this, WorkoutService.class);
+        intentWorkoutService.setAction(Constants.ACTION.STOP_FOREGROUND_ACTION);
+        startService(intentWorkoutService);
     }
 }
