@@ -10,7 +10,7 @@
         android:text="Workout Service" />
 
     <Button
-        android:text="START SERVICE"
+        android:text="START AND CONNECT SERVICE"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onStart4" />

@@ -68,22 +68,11 @@ public class WorkoutService extends Service {
         if (action.equals(Constants.ACTION.START_FOREGROUND_ACTION)) {
             Log.e(TAG, "Received Start Foreground Intent");
 
-            Intent notificationIntent = new Intent(this, WorkoutServiceActivity.class);
-            notificationIntent.setAction(Constants.ACTION.MAIN_ACTION);
-            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-            Intent previousIntent = new Intent(this, WorkoutService.class);
-            previousIntent.setAction(Constants.ACTION.PREV_ACTION);
-            PendingIntent ppreviousIntent = PendingIntent.getService(this, 0, previousIntent, 0);
-
-            Intent playIntent = new Intent(this, WorkoutService.class);
-            playIntent.setAction(Constants.ACTION.PLAY_ACTION);
-            PendingIntent pplayIntent = PendingIntent.getService(this, 0, playIntent, 0);
-
-            Intent nextIntent = new Intent(this, WorkoutService.class);
-            nextIntent.setAction(Constants.ACTION.NEXT_ACTION);
-            PendingIntent pnextIntent = PendingIntent.getService(this, 0, nextIntent, 0);
+            PendingIntent pendingIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.MAIN_ACTION);
+            PendingIntent previousIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.PREV_ACTION);
+            PendingIntent playIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.PLAY_ACTION);
+            PendingIntent nextIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.NEXT_ACTION);
+            PendingIntent closeIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.STOP_FOREGROUND_ACTION);
 
             Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
@@ -95,9 +84,9 @@ public class WorkoutService extends Service {
                     .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
                     .setContentIntent(pendingIntent)
                     .setOngoing(true)
-                    .addAction(android.R.drawable.ic_media_previous, "Previous", ppreviousIntent)
-                    .addAction(android.R.drawable.ic_media_play, "Play", pplayIntent)
-                    .addAction(android.R.drawable.ic_media_next, "Next", pnextIntent)
+                    .addAction(android.R.drawable.ic_media_previous, "Previous", previousIntent)
+                    .addAction(android.R.drawable.ic_media_play, "Play", playIntent)
+                    .addAction(android.R.drawable.ic_media_next, "Next", nextIntent)
                     .build();
 
             startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
