@@ -10,6 +10,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 
@@ -63,6 +64,8 @@ public class WorkoutService extends Service {
 
     /*
     Service discuss with notification
+    TODO http://blog.nkdroidsolutions.com/android-foreground-service-example-tutorial/
+    TODO http://www.truiton.com/2014/10/android-foreground-service-example/
      */
     public void startForegroundNotification(String action) {
         if (action.equals(Constants.ACTION.START_FOREGROUND_ACTION)) {
@@ -74,9 +77,10 @@ public class WorkoutService extends Service {
             PendingIntent nextIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.NEXT_ACTION);
             PendingIntent closeIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.STOP_FOREGROUND_ACTION);
 
+            RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification);
             Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
-            Notification notification = new NotificationCompat.Builder(this)
+            /*Notification notification = new NotificationCompat.Builder(this)
                     .setContentTitle("Truiton Music Player")
                     .setTicker("Truiton Music Player")
                     .setContentText("My Music")
@@ -87,6 +91,16 @@ public class WorkoutService extends Service {
                     .addAction(android.R.drawable.ic_media_previous, "Previous", previousIntent)
                     .addAction(android.R.drawable.ic_media_play, "Play", playIntent)
                     .addAction(android.R.drawable.ic_media_next, "Next", nextIntent)
+                    .build();*/
+
+            Notification notification = new NotificationCompat.Builder(this)
+                    .setContentTitle("nkDroid Music Player")
+                    .setTicker("nkDroid Music Player")
+                    .setContentText("nkDroid Music")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
+                    .setContent(notificationView)
+                    .setOngoing(true)
                     .build();
 
             startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
