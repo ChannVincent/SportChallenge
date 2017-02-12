@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".service.WorkoutServiceActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -17,8 +17,7 @@
         </activity>
 
         <service android:name=".service.WorkoutService"/>
-
-        <receiver android:name=".service.Constants$NotificationButtonHandler"/>
+        <receiver android:name=".service.NotificationConstants$NotificationReceiver"/>
 
     </application>
 

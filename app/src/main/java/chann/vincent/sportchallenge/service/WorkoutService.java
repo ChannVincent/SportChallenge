@@ -1,7 +1,6 @@
 package chann.vincent.sportchallenge.service;
 
-import android.app.Notification;
-import android.app.Service;
+import android.app.*;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -12,94 +11,98 @@ import android.widget.RemoteViews;
 import chann.vincent.sportchallenge.R;
 
 /**
- * Created by vincentchann on 03/02/2017.
+ * Created by vincentchann on 12/02/2017.
  */
 
 public class WorkoutService extends Service {
 
     private String TAG = "WorkoutService";
-    protected WorkoutBinder workoutBinder = new WorkoutBinder();
+    protected WorkoutBinder workoutBinder = new WorkoutService.WorkoutBinder();
     protected WorkoutServiceListener listener = null;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.e(TAG, "onCreate()");
-    }
-
+    /*
+    Life cycle
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "onStartCommand() - action : " + intent.getAction());
-        if (intent.getAction() != null) {
-            startForegroundCustomNotification(intent.getAction());
+        String action = intent.getAction();
+        Log.e(TAG, "onStartCommand() - action : " + action);
+        if (action != null) {
+            if (action.equals(NotificationConstants.ACTION.START_FOREGROUND)) {
+                startActionForegroundNotification();
+            }
+            else if (action.equals(NotificationConstants.ACTION.PREVIOUS)) {
+                startActionPrevious();
+            }
+            else if (action.equals(NotificationConstants.ACTION.NEXT)) {
+                startActionNext();
+            }
+            else if (action.equals(NotificationConstants.ACTION.PLAY)) {
+                startActionPlay();
+            }
+            else if (action.equals(NotificationConstants.ACTION.PAUSE)) {
+                startActionPause();
+            }
+            else if (action.equals(NotificationConstants.ACTION.STOP_FOREGROUND)) {
+                startActionFinish();
+            }
         }
         return super.onStartCommand(intent, flags, startId);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.e(TAG, "onDestroy()");
-    }
-
     /*
-    Raw action
+    Actions
      */
-    protected void startAction1() {
+    protected void startActionPlay() {
         if (listener != null) {
-            listener.triggerAction1("action1");
+            listener.play();
         }
     }
 
-    protected void startAction2() {
+    protected void startActionPause() {
         if (listener != null) {
-            listener.triggerAction2("action2");
+            listener.pause();
         }
     }
 
-    /*
-    Service discuss with notification
-     */
-    public void startForegroundCustomNotification(String action) {
-        if (action.equals(Constants.ACTION.START_FOREGROUND_ACTION)) {
-            Log.e(TAG, "Received Start Foreground Intent");
-
-            // remote views
-            RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification);
-            RemoteViews notificationBigView = new RemoteViews(this.getPackageName(), R.layout.notification_big);
-
-            // previous pending intent
-            notificationView.setOnClickPendingIntent(R.id.action_1, Constants.getCustomPendingIntent(this, Constants.ACTION.PREV_ACTION));
-            notificationBigView.setOnClickPendingIntent(R.id.action_1, Constants.getCustomPendingIntent(this, Constants.ACTION.PREV_ACTION));
-
-            // play pending intent
-            notificationView.setOnClickPendingIntent(R.id.action_2, Constants.getCustomPendingIntent(this, Constants.ACTION.PLAY_ACTION));
-            notificationBigView.setOnClickPendingIntent(R.id.action_2, Constants.getCustomPendingIntent(this, Constants.ACTION.PLAY_ACTION));
-
-            Notification notification = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setCustomContentView(notificationView)
-                    .setCustomBigContentView(notificationBigView)
-                    .build();
-
-            startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
+    protected void startActionNext() {
+        if (listener != null) {
+            listener.next();
         }
-        else if (action.equals(Constants.ACTION.PREV_ACTION)) {
-            Log.e(TAG, "Clicked Previous");
-            startAction1();
+    }
+
+    protected void startActionPrevious() {
+        if (listener != null) {
+            listener.previous();
         }
-        else if (action.equals(Constants.ACTION.PLAY_ACTION)) {
-            Log.e(TAG, "Clicked Play");
-            startAction2();
-        }
-        else if (action.equals(Constants.ACTION.NEXT_ACTION)) {
-            Log.e(TAG, "Clicked Next");
-        }
-        else if (action.equals(Constants.ACTION.STOP_FOREGROUND_ACTION)) {
-            Log.e(TAG, "Received Stop Foreground Intent");
-            stopForeground(true);
-            stopSelf();
-        }
+    }
+
+    protected void startActionFinish() {
+        stopForeground(true);
+        stopSelf();
+    }
+
+    protected void startActionForegroundNotification() {
+        // remote views
+        RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification);
+        RemoteViews notificationBigView = new RemoteViews(this.getPackageName(), R.layout.notification_big);
+
+        // actions
+        notificationBigView.setOnClickPendingIntent(R.id.action_previous, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PREVIOUS));
+        notificationBigView.setOnClickPendingIntent(R.id.action_next, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.NEXT));
+        notificationBigView.setOnClickPendingIntent(R.id.action_play, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PLAY));
+        notificationBigView.setOnClickPendingIntent(R.id.action_pause, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PAUSE));
+        notificationBigView.setOnClickPendingIntent(R.id.action_finish, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.STOP_FOREGROUND));
+
+        // create notification
+        Notification notification = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setCustomContentView(notificationView)
+                .setCustomBigContentView(notificationBigView)
+                .build();
+
+        // show notification
+        startForeground(NotificationConstants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
     }
 
     /*
@@ -120,49 +123,4 @@ public class WorkoutService extends Service {
     public void setListener(WorkoutServiceListener listener) {
         this.listener = listener;
     }
-
-    /*
-    public void startForegroundNotification(String action) {
-        if (action.equals(Constants.ACTION.START_FOREGROUND_ACTION)) {
-            Log.e(TAG, "Received Start Foreground Intent");
-
-            PendingIntent pendingIntent = Constants.getPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.MAIN_ACTION);
-            PendingIntent previousIntent = Constants.getPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.PREV_ACTION);
-            PendingIntent playIntent = Constants.getPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.PLAY_ACTION);
-            PendingIntent nextIntent = Constants.getPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.NEXT_ACTION);
-
-            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-            Notification notification = new NotificationCompat.Builder(this)
-                    .setContentTitle("Truiton Music Player")
-                    .setTicker("Truiton Music Player")
-                    .setContentText("My Music")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .addAction(android.R.drawable.ic_media_previous, "Previous", previousIntent)
-                    .addAction(android.R.drawable.ic_media_play, "Play", playIntent)
-                    .addAction(android.R.drawable.ic_media_next, "Next", nextIntent)
-                    .build();
-
-            startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
-        }
-        else if (action.equals(Constants.ACTION.PREV_ACTION)) {
-            Log.e(TAG, "Clicked Previous");
-            startAction1();
-        }
-        else if (action.equals(Constants.ACTION.PLAY_ACTION)) {
-            Log.e(TAG, "Clicked Play");
-            startAction2();
-        }
-        else if (action.equals(Constants.ACTION.NEXT_ACTION)) {
-            Log.e(TAG, "Clicked Next");
-        }
-        else if (action.equals(Constants.ACTION.STOP_FOREGROUND_ACTION)) {
-            Log.e(TAG, "Received Stop Foreground Intent");
-            stopForeground(true);
-            stopSelf();
-        }
-    }
-    */
 }
