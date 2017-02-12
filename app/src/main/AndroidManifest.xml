@@ -16,9 +16,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".intent_service.WorkoutIntentService"/>
-
         <service android:name=".service.WorkoutService"/>
+
+        <receiver android:name=".service.Constants$NotificationButtonHandler"/>
 
     </application>
 

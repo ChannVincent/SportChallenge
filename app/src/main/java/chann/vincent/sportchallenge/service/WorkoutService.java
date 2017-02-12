@@ -1,18 +1,13 @@
 package chann.vincent.sportchallenge.service;
 
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
-
 
 import chann.vincent.sportchallenge.R;
 
@@ -36,7 +31,7 @@ public class WorkoutService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand() - action : " + intent.getAction());
         if (intent.getAction() != null) {
-            startForegroundNotification(intent.getAction());
+            startForegroundCustomNotification(intent.getAction());
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -64,43 +59,27 @@ public class WorkoutService extends Service {
 
     /*
     Service discuss with notification
-    TODO http://blog.nkdroidsolutions.com/android-foreground-service-example-tutorial/
-    TODO http://www.truiton.com/2014/10/android-foreground-service-example/
      */
-    public void startForegroundNotification(String action) {
+    public void startForegroundCustomNotification(String action) {
         if (action.equals(Constants.ACTION.START_FOREGROUND_ACTION)) {
             Log.e(TAG, "Received Start Foreground Intent");
 
-            PendingIntent pendingIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.MAIN_ACTION);
-            PendingIntent previousIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.PREV_ACTION);
-            PendingIntent playIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.PLAY_ACTION);
-            PendingIntent nextIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.NEXT_ACTION);
-            PendingIntent closeIntent = Constants.getMainPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.STOP_FOREGROUND_ACTION);
-
+            // remote views
             RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification);
-            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+            RemoteViews notificationBigView = new RemoteViews(this.getPackageName(), R.layout.notification_big);
 
-            /*Notification notification = new NotificationCompat.Builder(this)
-                    .setContentTitle("Truiton Music Player")
-                    .setTicker("Truiton Music Player")
-                    .setContentText("My Music")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .addAction(android.R.drawable.ic_media_previous, "Previous", previousIntent)
-                    .addAction(android.R.drawable.ic_media_play, "Play", playIntent)
-                    .addAction(android.R.drawable.ic_media_next, "Next", nextIntent)
-                    .build();*/
+            // previous pending intent
+            notificationView.setOnClickPendingIntent(R.id.action_1, Constants.getCustomPendingIntent(this, Constants.ACTION.PREV_ACTION));
+            notificationBigView.setOnClickPendingIntent(R.id.action_1, Constants.getCustomPendingIntent(this, Constants.ACTION.PREV_ACTION));
+
+            // play pending intent
+            notificationView.setOnClickPendingIntent(R.id.action_2, Constants.getCustomPendingIntent(this, Constants.ACTION.PLAY_ACTION));
+            notificationBigView.setOnClickPendingIntent(R.id.action_2, Constants.getCustomPendingIntent(this, Constants.ACTION.PLAY_ACTION));
 
             Notification notification = new NotificationCompat.Builder(this)
-                    .setContentTitle("nkDroid Music Player")
-                    .setTicker("nkDroid Music Player")
-                    .setContentText("nkDroid Music")
                     .setSmallIcon(R.mipmap.ic_launcher)
-                    .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
-                    .setContent(notificationView)
-                    .setOngoing(true)
+                    .setCustomContentView(notificationView)
+                    .setCustomBigContentView(notificationBigView)
                     .build();
 
             startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
@@ -141,4 +120,49 @@ public class WorkoutService extends Service {
     public void setListener(WorkoutServiceListener listener) {
         this.listener = listener;
     }
+
+    /*
+    public void startForegroundNotification(String action) {
+        if (action.equals(Constants.ACTION.START_FOREGROUND_ACTION)) {
+            Log.e(TAG, "Received Start Foreground Intent");
+
+            PendingIntent pendingIntent = Constants.getPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.MAIN_ACTION);
+            PendingIntent previousIntent = Constants.getPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.PREV_ACTION);
+            PendingIntent playIntent = Constants.getPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.PLAY_ACTION);
+            PendingIntent nextIntent = Constants.getPendingIntent(this, WorkoutServiceActivity.class, Constants.ACTION.NEXT_ACTION);
+
+            Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+            Notification notification = new NotificationCompat.Builder(this)
+                    .setContentTitle("Truiton Music Player")
+                    .setTicker("Truiton Music Player")
+                    .setContentText("My Music")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
+                    .setContentIntent(pendingIntent)
+                    .setOngoing(true)
+                    .addAction(android.R.drawable.ic_media_previous, "Previous", previousIntent)
+                    .addAction(android.R.drawable.ic_media_play, "Play", playIntent)
+                    .addAction(android.R.drawable.ic_media_next, "Next", nextIntent)
+                    .build();
+
+            startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
+        }
+        else if (action.equals(Constants.ACTION.PREV_ACTION)) {
+            Log.e(TAG, "Clicked Previous");
+            startAction1();
+        }
+        else if (action.equals(Constants.ACTION.PLAY_ACTION)) {
+            Log.e(TAG, "Clicked Play");
+            startAction2();
+        }
+        else if (action.equals(Constants.ACTION.NEXT_ACTION)) {
+            Log.e(TAG, "Clicked Next");
+        }
+        else if (action.equals(Constants.ACTION.STOP_FOREGROUND_ACTION)) {
+            Log.e(TAG, "Received Stop Foreground Intent");
+            stopForeground(true);
+            stopSelf();
+        }
+    }
+    */
 }
