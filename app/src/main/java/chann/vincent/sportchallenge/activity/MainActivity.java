@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import chann.vincent.sportchallenge.R;
@@ -20,12 +21,14 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = "MainActivity";
     protected Intent intentWorkoutService = null;
     protected MainActivity getActivity() { return this; }
+    protected TextView timerTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
         startAndConnectToWorkoutService();
+        timerTextView = (TextView) findViewById(R.id.text);
     }
 
     /*
@@ -62,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void previous() {
                             Toast.makeText(getActivity(), "previous", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void timer(int timer, int maxTimer) {
+                            if (timerTextView != null) {
+                                timerTextView.setText("timer : " + timer + " / " + maxTimer);
+                            }
                         }
                     });
                 }

@@ -10,8 +10,11 @@ import android.widget.RemoteViews;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 
 import chann.vincent.sportchallenge.R;
+import chann.vincent.sportchallenge.timer.TimerListener;
+import chann.vincent.sportchallenge.timer.TimerManager;
 import fr.smartapps.lib.SMAAssetManager;
 import fr.smartapps.lib.audio.SMAAudioPlayer;
 import fr.smartapps.lib.audio.SMAAudioPlayerListener;
@@ -28,6 +31,7 @@ public class WorkoutService extends Service {
     protected SMAAssetManager assetManager;
     protected SMAAudioPlayer audioPlayerMusic;
     protected SMAAudioPlayer audioPlayerCheers;
+    protected TimerManager timerManager;
     protected List<String> audioFileList = new ArrayList<>();
     protected int currentCheerPosition = 0;
 
@@ -47,6 +51,8 @@ public class WorkoutService extends Service {
         audioFileList.add("media05.mp3");
         audioFileList.add("media06.mp3");
         audioFileList.add("media07.mp3");
+        initMusic("music01.mp3");
+        initTimer();
     }
 
     @Override
@@ -55,7 +61,7 @@ public class WorkoutService extends Service {
         Log.e(TAG, "onStartCommand() - action : " + action);
         if (action != null) {
             if (action.equals(NotificationConstants.ACTION.START_FOREGROUND)) {
-                startActionForegroundNotification();
+                startActionForegroundNotification(0);
             }
             else if (action.equals(NotificationConstants.ACTION.PREVIOUS)) {
                 startActionPrevious();
@@ -82,46 +88,63 @@ public class WorkoutService extends Service {
     protected void startActionPlay() {
         if (listener != null) {
             listener.play();
-            startMusic("music01.mp3");
         }
+        startMusic();
+        startTimer();
     }
 
     protected void startActionPause() {
         if (listener != null) {
             listener.pause();
-            pauseMusic();
         }
+        pauseMusic();
+        pauseTimer();
     }
 
     protected void startActionNext() {
         if (listener != null) {
             listener.next();
-            if (currentCheerPosition < (audioFileList.size() - 1)) {
-                currentCheerPosition++;
-            }
-            startCheer(audioFileList.get(currentCheerPosition));
         }
+        if (currentCheerPosition < (audioFileList.size() - 1)) {
+            currentCheerPosition++;
+        }
+        startCheer(audioFileList.get(currentCheerPosition));
     }
 
     protected void startActionPrevious() {
         if (listener != null) {
             listener.previous();
-            if (currentCheerPosition > 0) {
-                currentCheerPosition--;
-            }
-            startCheer(audioFileList.get(currentCheerPosition));
         }
+        if (currentCheerPosition > 0) {
+            currentCheerPosition--;
+        }
+        startCheer(audioFileList.get(currentCheerPosition));
     }
 
     protected void startActionFinish() {
+        if (audioPlayerMusic != null) {
+            audioPlayerMusic.pause();
+        }
+        if (audioPlayerCheers != null) {
+            audioPlayerCheers.pause();
+        }
+        pauseTimer();
         stopForeground(true);
         stopSelf();
     }
 
-    protected void startActionForegroundNotification() {
+    protected void startActionUpdateTimer(int timer) {
+        if (listener != null) {
+            listener.timer(timer, timerManager.getMaxTimer());
+        }
+        startActionForegroundNotification(timer);
+    }
+
+    protected void startActionForegroundNotification(int timer) {
         // remote views
         RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification);
         RemoteViews notificationBigView = new RemoteViews(this.getPackageName(), R.layout.notification_big);
+        notificationBigView.setTextViewText(R.id.text, "timer : " + timer);
 
         // actions
         notificationBigView.setOnClickPendingIntent(R.id.action_previous, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PREVIOUS));
@@ -144,7 +167,7 @@ public class WorkoutService extends Service {
     /*
     Audio
      */
-    protected void startMusic(String filename, float volume) {
+    protected void initMusic(String filename, float volume) {
         audioPlayerMusic = assetManager.getAudioPlayer("music/" + filename, this, new SMAAudioPlayerListener() {
             @Override
             public void onSongProgress(int progress, int totalProgress) {
@@ -156,12 +179,15 @@ public class WorkoutService extends Service {
                 // callback when the song is finished
             }
         });
-        audioPlayerMusic.start();
         audioPlayerMusic.setVolume(volume);
     }
 
-    protected void startMusic(String filename) {
-        startMusic(filename, 0.15f);
+    protected void initMusic(String filename) {
+        initMusic(filename, 0.15f);
+    }
+
+    protected void startMusic() {
+        audioPlayerMusic.start();
     }
 
     protected void pauseMusic() {
@@ -183,6 +209,35 @@ public class WorkoutService extends Service {
 
     protected void startCheer(String filename) {
         startCheer(filename, 1f);
+    }
+
+    /*
+    Timer
+     */
+    protected void initTimer() {
+        timerManager = new TimerManager(45, this, new TimerListener() {
+            @Override
+            public void progress(int timer) {
+                startActionUpdateTimer(timer);
+            }
+
+            @Override
+            public void onFinish() {
+
+            }
+        });
+    }
+
+    protected void startTimer() {
+        if (timerManager != null) {
+            timerManager.start();
+        }
+    }
+
+    protected void pauseTimer() {
+        if (timerManager != null) {
+            timerManager.pause();
+        }
     }
 
     /*

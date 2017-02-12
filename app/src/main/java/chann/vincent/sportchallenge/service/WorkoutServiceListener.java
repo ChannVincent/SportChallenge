@@ -10,5 +10,6 @@ public interface WorkoutServiceListener {
     public void pause();
     public void next();
     public void previous();
+    public void timer(int timer, int maxTimer);
 
 }
