@@ -162,6 +162,20 @@ public class WorkoutService extends Service {
 
         // show notification
         startForeground(NotificationConstants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
+
+        /*
+        // glide image loading into notification
+        // TODO https://futurestud.io/tutorials/glide-loading-images-into-notifications-and-appwidgets
+        NotificationTarget notificationTarget = new NotificationTarget(this,
+                notificationBigView,
+                R.id.image,
+                notification,
+                NotificationConstants.NOTIFICATION_ID.FOREGROUND_SERVICE);
+        Glide.with(this.getApplicationContext()) // safer!
+                .load(new SMAFile("gif/power_jump.gif", assetManager))
+                .asBitmap()
+                .into(notificationTarget);
+                */
     }
 
     /*
