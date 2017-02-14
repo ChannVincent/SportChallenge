@@ -6,29 +6,47 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import chann.vincent.sportchallenge.R;
+import chann.vincent.sportchallenge.fragment.WorkoutFragment;
 import chann.vincent.sportchallenge.service.NotificationConstants;
 import chann.vincent.sportchallenge.service.WorkoutService;
 import chann.vincent.sportchallenge.service.WorkoutServiceListener;
+import fr.smartapps.smasupportv1.pager.SMAViewPager;
+import fr.smartapps.smasupportv1.pager.Transition;
 
-public class MainActivity extends AppCompatActivity {
+public class WorkoutActivity extends AppCompatActivity {
 
-    private String TAG = "MainActivity";
+    private String TAG = "WorkoutActivity";
     protected Intent intentWorkoutService = null;
-    protected MainActivity getActivity() { return this; }
+    protected WorkoutActivity getActivity() { return this; }
     protected TextView timerTextView;
+    protected SMAViewPager pager;
 
+    /*
+    Life cycle
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
         startAndConnectToWorkoutService();
-        timerTextView = (TextView) findViewById(R.id.text);
+        initViewPager();
+    }
+
+    /*
+    ViewPager
+     */
+    protected void initViewPager() {
+        pager = (SMAViewPager) findViewById(R.id.workout_pager);
+        pager.fragmentManager(getFragmentManager())
+                .setFragments(new WorkoutFragment())
+                .transformer(Transition.ACCORDION)
+                .swipeable(true)
+                .create();
     }
 
     /*
@@ -36,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void startAndConnectToWorkoutService() {
         Toast.makeText(this, "Start service", Toast.LENGTH_SHORT).show();
+        timerTextView = (TextView) findViewById(R.id.text);
         intentWorkoutService = new Intent(this, WorkoutService.class);
+
         intentWorkoutService.setAction(NotificationConstants.ACTION.START_FOREGROUND);
         startService(intentWorkoutService);
         bindService(intentWorkoutService, new ServiceConnection() {
@@ -85,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-    Actions
+    Actions sent to workout service
      */
     public void startActionPlay(View view) {
         intentWorkoutService = new Intent(this, WorkoutService.class);

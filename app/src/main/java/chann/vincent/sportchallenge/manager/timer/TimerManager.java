@@ -1,4 +1,4 @@
-package chann.vincent.sportchallenge.timer;
+package chann.vincent.sportchallenge.manager.timer;
 
 import android.content.Context;
 import android.os.Handler;

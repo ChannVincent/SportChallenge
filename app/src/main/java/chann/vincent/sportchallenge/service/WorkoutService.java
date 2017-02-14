@@ -10,11 +10,10 @@ import android.widget.RemoteViews;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Handler;
 
 import chann.vincent.sportchallenge.R;
-import chann.vincent.sportchallenge.timer.TimerListener;
-import chann.vincent.sportchallenge.timer.TimerManager;
+import chann.vincent.sportchallenge.manager.timer.TimerListener;
+import chann.vincent.sportchallenge.manager.timer.TimerManager;
 import fr.smartapps.lib.SMAAssetManager;
 import fr.smartapps.lib.audio.SMAAudioPlayer;
 import fr.smartapps.lib.audio.SMAAudioPlayerListener;

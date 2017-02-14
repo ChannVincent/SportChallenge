@@ -1,4 +1,4 @@
-package chann.vincent.sportchallenge.timer;
+package chann.vincent.sportchallenge.manager.timer;
 
 /**
  * Created by vincentchann on 12/02/2017.
