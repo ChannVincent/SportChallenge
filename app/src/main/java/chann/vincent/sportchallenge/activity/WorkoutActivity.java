@@ -43,8 +43,8 @@ public class WorkoutActivity extends AppCompatActivity {
     protected void initViewPager() {
         pager = (SMAViewPager) findViewById(R.id.workout_pager);
         pager.fragmentManager(getFragmentManager())
-                .setFragments(new WorkoutFragment())
-                .transformer(Transition.ACCORDION)
+                .setFragments(WorkoutFragment.newInstance("TITLE 1", "power_jump.gif"), WorkoutFragment.newInstance("TITLE 2", "power_jacks.gif"))
+                .pageBoundaries(20, 20)
                 .swipeable(true)
                 .create();
     }
