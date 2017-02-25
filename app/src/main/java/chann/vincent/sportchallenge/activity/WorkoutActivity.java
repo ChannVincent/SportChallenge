@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +37,47 @@ public class WorkoutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
         startAndConnectToWorkoutService();
+        initNavigationBar();
         initViewPager();
+    }
+
+    /*
+    Navigation bar
+     */
+    protected void initNavigationBar() {
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Custom title");
+        getSupportActionBar().setSubtitle("Custom subtitle");
+    }
+
+    protected void setNavigationBarTitles(String title, String subtitle) {
+        getSupportActionBar().setTitle(title);
+        getSupportActionBar().setSubtitle(subtitle);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.workout_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                finish();
+                return true;
+            case R.id.action_share:
+                Toast.makeText(getActivity(), "share", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.action_favorite:
+                Toast.makeText(getActivity(), "add to favorite", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /*
@@ -47,6 +90,22 @@ public class WorkoutActivity extends AppCompatActivity {
                 .pageBoundaries(20, 20)
                 .swipeable(true)
                 .create();
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setNavigationBarTitles("title " + (position + 1), "subtitle " + (position + 1));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     /*

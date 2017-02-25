@@ -1,3 +1,11 @@
 <resources>
+
+    <!-- main -->
     <string name="app_name">SportChallenge</string>
+
+    <!-- menu -->
+    <string name="menu_share">Share</string>
+    <string name="menu_favorite">Add to favorite</string>
+
+
 </resources>
