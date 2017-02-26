@@ -104,14 +104,14 @@ public class WorkoutService extends Service {
     protected void startActionNextPage() {
         if (listener != null) {
             listener.next();
+            restartTimer();
         }
     }
 
     protected void startActionPreviousPage() {
         if (listener != null) {
             listener.previous();
-            initTimer();
-            startTimer();
+            restartTimer();
         }
     }
 
@@ -246,8 +246,6 @@ public class WorkoutService extends Service {
             @Override
             public void onFinish() {
                 startActionNextPage();
-                initTimer();
-                startTimer();
             }
         });
     }
@@ -262,6 +260,12 @@ public class WorkoutService extends Service {
         if (timerManager != null) {
             timerManager.pause();
         }
+    }
+
+    protected void restartTimer() {
+        pauseTimer();
+        initTimer();
+        startTimer();
     }
 
     /*

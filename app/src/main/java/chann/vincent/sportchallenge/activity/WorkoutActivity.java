@@ -130,13 +130,13 @@ public class WorkoutActivity extends AppCompatActivity {
         onPageChangeListener.onPageSelected(0);
     }
 
-    public void startNextPage(View view) {
+    public void nextPage() {
         if (pager != null && pager.getCurrentItem() < pager.getChildCount()) {
             pager.setCurrentItem(pager.getCurrentItem() + 1);
         }
     }
 
-    public void startPreviousPage(View view) {
+    public void previousPage() {
         if (pager != null && pager.getCurrentItem() > 0) {
             pager.setCurrentItem(pager.getCurrentItem() - 1);
         }
@@ -172,14 +172,12 @@ public class WorkoutActivity extends AppCompatActivity {
 
                         @Override
                         public void next() {
-                            Toast.makeText(getActivity(), "NEXT", Toast.LENGTH_SHORT).show();
-                            startNextPage(null);
+                            nextPage();
                         }
 
                         @Override
                         public void previous() {
-                            Toast.makeText(getActivity(), "PREVIOUS", Toast.LENGTH_SHORT).show();
-                            startPreviousPage(null);
+                            previousPage();
                         }
 
                         @Override
@@ -217,13 +215,13 @@ public class WorkoutActivity extends AppCompatActivity {
         startService(intentWorkoutService);
     }
 
-    public void startActionNextCheer(View view) {
+    public void startActionNextPage(View view) {
         intentWorkoutService = new Intent(this, WorkoutService.class);
         intentWorkoutService.setAction(NotificationConstants.ACTION.NEXT);
         startService(intentWorkoutService);
     }
 
-    public void startActionPreviousCheer(View view) {
+    public void startActionPreviousPage(View view) {
         intentWorkoutService = new Intent(this, WorkoutService.class);
         intentWorkoutService.setAction(NotificationConstants.ACTION.PREVIOUS);
         startService(intentWorkoutService);
