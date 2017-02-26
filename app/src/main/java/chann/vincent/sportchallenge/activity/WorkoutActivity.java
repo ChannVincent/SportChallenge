@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikhaellopez.circularprogressbar.CircularProgressBar;
+
 import chann.vincent.sportchallenge.R;
 import chann.vincent.sportchallenge.fragment.WorkoutFragment;
 import chann.vincent.sportchallenge.service.NotificationConstants;
@@ -27,6 +29,7 @@ public class WorkoutActivity extends AppCompatActivity {
     protected Intent intentWorkoutService = null;
     protected WorkoutActivity getActivity() { return this; }
     protected TextView timerTextView;
+    protected CircularProgressBar timerProgressView;
     protected SMAViewPager pager;
 
     /*
@@ -41,9 +44,15 @@ public class WorkoutActivity extends AppCompatActivity {
         initViewPager();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startActionPlay(new View(getActivity()));
+    }
+
     /*
-    Navigation bar
-     */
+        Navigation bar
+         */
     protected void initNavigationBar() {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -113,7 +122,8 @@ public class WorkoutActivity extends AppCompatActivity {
      */
     public void startAndConnectToWorkoutService() {
         Toast.makeText(this, "Start service", Toast.LENGTH_SHORT).show();
-        timerTextView = (TextView) findViewById(R.id.text);
+        timerTextView = (TextView) findViewById(R.id.text_timer);
+        timerProgressView = (CircularProgressBar) findViewById(R.id.progress_bar_timer);
         intentWorkoutService = new Intent(this, WorkoutService.class);
 
         intentWorkoutService.setAction(NotificationConstants.ACTION.START_FOREGROUND);
@@ -149,7 +159,10 @@ public class WorkoutActivity extends AppCompatActivity {
                         @Override
                         public void timer(int timer, int maxTimer) {
                             if (timerTextView != null) {
-                                timerTextView.setText("timer : " + timer + " / " + maxTimer);
+                                int remainingTime = maxTimer - timer;
+                                int percentRemainingTime = timer * 100 / maxTimer;
+                                timerTextView.setText("" + remainingTime);
+                                timerProgressView.setProgress(percentRemainingTime);
                             }
                         }
                     });
