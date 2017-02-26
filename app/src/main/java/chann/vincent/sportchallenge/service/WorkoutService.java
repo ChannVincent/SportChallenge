@@ -33,6 +33,7 @@ public class WorkoutService extends Service {
     protected TimerManager timerManager;
     protected List<String> audioFileList = new ArrayList<>();
     protected int currentCheerPosition = 0;
+    protected boolean isPlaying = false;
 
     /*
     Life cycle
@@ -63,10 +64,10 @@ public class WorkoutService extends Service {
                 startActionForegroundNotification(0);
             }
             else if (action.equals(NotificationConstants.ACTION.PREVIOUS)) {
-                startActionPrevious();
+                startActionPreviousPage();
             }
             else if (action.equals(NotificationConstants.ACTION.NEXT)) {
-                startActionNext();
+                startActionNextPage();
             }
             else if (action.equals(NotificationConstants.ACTION.PLAY)) {
                 startActionPlay();
@@ -100,20 +101,28 @@ public class WorkoutService extends Service {
         pauseTimer();
     }
 
-    protected void startActionNext() {
+    protected void startActionNextPage() {
         if (listener != null) {
             listener.next();
         }
+    }
+
+    protected void startActionPreviousPage() {
+        if (listener != null) {
+            listener.previous();
+            initTimer();
+            startTimer();
+        }
+    }
+
+    protected void startActionNextCheer() {
         if (currentCheerPosition < (audioFileList.size() - 1)) {
             currentCheerPosition++;
         }
         startCheer(audioFileList.get(currentCheerPosition));
     }
 
-    protected void startActionPrevious() {
-        if (listener != null) {
-            listener.previous();
-        }
+    protected void startActionPreviousCheer() {
         if (currentCheerPosition > 0) {
             currentCheerPosition--;
         }
@@ -236,7 +245,9 @@ public class WorkoutService extends Service {
 
             @Override
             public void onFinish() {
-
+                startActionNextPage();
+                initTimer();
+                startTimer();
             }
         });
     }

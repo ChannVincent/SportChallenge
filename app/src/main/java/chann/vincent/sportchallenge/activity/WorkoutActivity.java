@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +33,8 @@ public class WorkoutActivity extends AppCompatActivity {
     protected TextView timerTextView;
     protected CircularProgressBar timerProgressView;
     protected SMAViewPager pager;
+    protected ImageButton buttonPrevious;
+    protected ImageButton buttonNext;
 
     /*
     Life cycle
@@ -87,13 +91,15 @@ public class WorkoutActivity extends AppCompatActivity {
     ViewPager
      */
     protected void initViewPager() {
+        buttonPrevious = (ImageButton) findViewById(R.id.button_previous);
+        buttonNext = (ImageButton) findViewById(R.id.button_next);
         pager = (SMAViewPager) findViewById(R.id.workout_pager);
         pager.fragmentManager(getFragmentManager())
                 .setFragments(WorkoutFragment.newInstance("TITLE 1", "power_jump.gif"), WorkoutFragment.newInstance("TITLE 2", "power_jacks.gif"))
                 .pageBoundaries(20, 20)
-                .swipeable(true)
+                .swipeable(false)
                 .create();
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -102,20 +108,44 @@ public class WorkoutActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 setNavigationBarTitles("title " + (position + 1), "subtitle " + (position + 1));
+                if (position == 0) {
+                    buttonPrevious.setVisibility(View.INVISIBLE);
+                    buttonNext.setVisibility(View.VISIBLE);
+                }
+
+                if (position == (pager.getChildCount() - 1)) {
+                    buttonPrevious.setVisibility(View.VISIBLE);
+                    buttonNext.setVisibility(View.INVISIBLE);
+                }
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
 
             }
-        });
+        };
+        pager.setOnPageChangeListener(onPageChangeListener);
+
+        // select first page at start
+        onPageChangeListener.onPageSelected(0);
+    }
+
+    public void startNextPage(View view) {
+        if (pager != null && pager.getCurrentItem() < pager.getChildCount()) {
+            pager.setCurrentItem(pager.getCurrentItem() + 1);
+        }
+    }
+
+    public void startPreviousPage(View view) {
+        if (pager != null && pager.getCurrentItem() > 0) {
+            pager.setCurrentItem(pager.getCurrentItem() - 1);
+        }
     }
 
     /*
     Start and bind to Workout Service
      */
     public void startAndConnectToWorkoutService() {
-        Toast.makeText(this, "Start service", Toast.LENGTH_SHORT).show();
         timerTextView = (TextView) findViewById(R.id.text_timer);
         timerProgressView = (CircularProgressBar) findViewById(R.id.progress_bar_timer);
         intentWorkoutService = new Intent(this, WorkoutService.class);
@@ -142,12 +172,14 @@ public class WorkoutActivity extends AppCompatActivity {
 
                         @Override
                         public void next() {
-                            Toast.makeText(getActivity(), "next", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "NEXT", Toast.LENGTH_SHORT).show();
+                            startNextPage(null);
                         }
 
                         @Override
                         public void previous() {
-                            Toast.makeText(getActivity(), "previous", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "PREVIOUS", Toast.LENGTH_SHORT).show();
+                            startPreviousPage(null);
                         }
 
                         @Override
@@ -185,13 +217,13 @@ public class WorkoutActivity extends AppCompatActivity {
         startService(intentWorkoutService);
     }
 
-    public void startActionNext(View view) {
+    public void startActionNextCheer(View view) {
         intentWorkoutService = new Intent(this, WorkoutService.class);
         intentWorkoutService.setAction(NotificationConstants.ACTION.NEXT);
         startService(intentWorkoutService);
     }
 
-    public void startActionPrevious(View view) {
+    public void startActionPreviousCheer(View view) {
         intentWorkoutService = new Intent(this, WorkoutService.class);
         intentWorkoutService.setAction(NotificationConstants.ACTION.PREVIOUS);
         startService(intentWorkoutService);
