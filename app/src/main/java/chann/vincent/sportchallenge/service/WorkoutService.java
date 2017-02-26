@@ -143,7 +143,7 @@ public class WorkoutService extends Service {
         // remote views
         RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification);
         RemoteViews notificationBigView = new RemoteViews(this.getPackageName(), R.layout.notification_big);
-        notificationBigView.setTextViewText(R.id.text, "timer : " + timer);
+        notificationBigView.setTextViewText(R.id.text_timer, "timer : " + timer);
 
         // actions
         notificationBigView.setOnClickPendingIntent(R.id.action_previous, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PREVIOUS));

@@ -44,15 +44,9 @@ public class WorkoutActivity extends AppCompatActivity {
         initViewPager();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        startActionPlay(new View(getActivity()));
-    }
-
     /*
-        Navigation bar
-         */
+    Navigation bar
+     */
     protected void initNavigationBar() {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
