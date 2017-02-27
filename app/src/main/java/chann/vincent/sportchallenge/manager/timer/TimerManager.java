@@ -15,6 +15,7 @@ public class TimerManager {
     protected Handler handler;
     protected Runnable runnable;
     protected TimerListener timerListener;
+    protected boolean isRunning = false;
 
     public TimerManager(final int timerCountMax, Context context, TimerListener listener) {
         this.timerCountMax = timerCountMax;
@@ -25,6 +26,7 @@ public class TimerManager {
         handler.post(runnable = new Runnable() {
             @Override
             public void run() {
+                isRunning = true;
                 timerListener.progress(timerCount);
                 handler.postDelayed(runnable, 1000);
                 if (timerCount >= timerCountMax) {
@@ -44,7 +46,7 @@ public class TimerManager {
     }
 
     public void start() {
-        if(runnable != null) {
+        if(runnable != null && !isRunning) {
             runnable.run();
         }
     }
@@ -52,6 +54,7 @@ public class TimerManager {
     public void pause() {
         if(handler != null) {
             handler.removeCallbacks(runnable);
+            isRunning = false;
         }
     }
 }

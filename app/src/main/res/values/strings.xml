@@ -4,8 +4,8 @@
     <string name="app_name">SportChallenge</string>
 
     <!-- menu -->
-    <string name="menu_share">Share</string>
-    <string name="menu_favorite">Add to favorite</string>
+    <string name="menu_music">Enable music</string>
+    <string name="menu_cheer">Enable cheer</string>
 
 
 </resources>

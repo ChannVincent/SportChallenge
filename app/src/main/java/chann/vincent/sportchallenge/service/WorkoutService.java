@@ -33,7 +33,9 @@ public class WorkoutService extends Service {
     protected TimerManager timerManager;
     protected List<String> audioFileList = new ArrayList<>();
     protected int currentCheerPosition = 0;
-    protected boolean isPlaying = false;
+    static protected boolean musicEnabled = false;
+    static protected boolean cheerEnabled = false;
+    static protected boolean isPlaying = false;
 
     /*
     Life cycle
@@ -61,7 +63,7 @@ public class WorkoutService extends Service {
         Log.e(TAG, "onStartCommand() - action : " + action);
         if (action != null) {
             if (action.equals(NotificationConstants.ACTION.START_FOREGROUND)) {
-                startActionForegroundNotification(0);
+                showForegroundNotification(0);
             }
             else if (action.equals(NotificationConstants.ACTION.PREVIOUS)) {
                 startActionPreviousPage();
@@ -83,14 +85,17 @@ public class WorkoutService extends Service {
     }
 
     /*
-    Actions
+    Command actions
      */
     protected void startActionPlay() {
         if (listener != null) {
             listener.play();
         }
-        startMusic();
+        if (musicEnabled) {
+            playMusic();
+        }
         startTimer();
+        isPlaying = true;
     }
 
     protected void startActionPause() {
@@ -98,7 +103,9 @@ public class WorkoutService extends Service {
             listener.pause();
         }
         pauseMusic();
+        endCheer();
         pauseTimer();
+        isPlaying = false;
     }
 
     protected void startActionNextPage() {
@@ -115,20 +122,6 @@ public class WorkoutService extends Service {
         }
     }
 
-    protected void startActionNextCheer() {
-        if (currentCheerPosition < (audioFileList.size() - 1)) {
-            currentCheerPosition++;
-        }
-        startCheer(audioFileList.get(currentCheerPosition));
-    }
-
-    protected void startActionPreviousCheer() {
-        if (currentCheerPosition > 0) {
-            currentCheerPosition--;
-        }
-        startCheer(audioFileList.get(currentCheerPosition));
-    }
-
     protected void startActionFinish() {
         if (audioPlayerMusic != null) {
             audioPlayerMusic.pause();
@@ -141,14 +134,32 @@ public class WorkoutService extends Service {
         stopSelf();
     }
 
-    protected void startActionUpdateTimer(int timer) {
+    /*
+    Service parameters
+     */
+    static public void setMusicEnabled(boolean enabled) {
+        musicEnabled = enabled;
+    }
+
+    static public void setCheerEnabled(boolean enabled) {
+        cheerEnabled = enabled;
+    }
+
+    static public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    /*
+    Foreground notification
+     */
+    protected void updateForegroundNotification(int timer) {
         if (listener != null) {
             listener.timer(timer, timerManager.getMaxTimer());
         }
-        startActionForegroundNotification(timer);
+        showForegroundNotification(timer);
     }
 
-    protected void startActionForegroundNotification(int timer) {
+    protected void showForegroundNotification(int timer) {
         // remote views
         RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification);
         RemoteViews notificationBigView = new RemoteViews(this.getPackageName(), R.layout.notification_big);
@@ -208,7 +219,7 @@ public class WorkoutService extends Service {
         initMusic(filename, 0.15f);
     }
 
-    protected void startMusic() {
+    protected void playMusic() {
         audioPlayerMusic.start();
     }
 
@@ -216,21 +227,38 @@ public class WorkoutService extends Service {
         audioPlayerMusic.pause();
     }
 
-    protected void startCheer(String filename, float volume) {
+    protected void playCheer(String filename, float volume) {
+        endCheer();
+        audioPlayerCheers = assetManager.getAudioPlayer("cheer/" + filename, this, null);
+        audioPlayerCheers.start();
+        audioPlayerCheers.setVolume(volume);
+    }
+
+    protected void playCheer(String filename) {
+        playCheer(filename, 1f);
+    }
+
+    protected void endCheer() {
         if (audioPlayerCheers != null) {
             audioPlayerCheers.pause();
             audioPlayerCheers.stop();
             audioPlayerCheers.release();
             audioPlayerCheers = null;
         }
-
-        audioPlayerCheers = assetManager.getAudioPlayer("cheer/" + filename, this, null);
-        audioPlayerCheers.start();
-        audioPlayerCheers.setVolume(volume);
     }
 
-    protected void startCheer(String filename) {
-        startCheer(filename, 1f);
+    protected void nextCheer() {
+        if (currentCheerPosition < (audioFileList.size() - 1)) {
+            currentCheerPosition++;
+        }
+        playCheer(audioFileList.get(currentCheerPosition));
+    }
+
+    protected void previousCheer() {
+        if (currentCheerPosition > 0) {
+            currentCheerPosition--;
+        }
+        playCheer(audioFileList.get(currentCheerPosition));
     }
 
     /*
@@ -240,7 +268,10 @@ public class WorkoutService extends Service {
         timerManager = new TimerManager(45, this, new TimerListener() {
             @Override
             public void progress(int timer) {
-                startActionUpdateTimer(timer);
+                updateForegroundNotification(timer);
+                if (cheerEnabled && (timer % 30 == 5)) {
+                    nextCheer();
+                }
             }
 
             @Override

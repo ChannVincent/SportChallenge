@@ -65,7 +65,7 @@ public class WorkoutActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.workout_menu, menu);
+        getMenuInflater().inflate(R.menu.workout_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -76,11 +76,17 @@ public class WorkoutActivity extends AppCompatActivity {
                 onBackPressed();
                 finish();
                 return true;
-            case R.id.action_share:
-                Toast.makeText(getActivity(), "share", Toast.LENGTH_SHORT).show();
+            case R.id.action_music:
+                WorkoutService.setMusicEnabled(true);
+                if (WorkoutService.isPlaying()) {
+                    startActionPlay(null);
+                }
                 return true;
-            case R.id.action_favorite:
-                Toast.makeText(getActivity(), "add to favorite", Toast.LENGTH_SHORT).show();
+            case R.id.action_cheer:
+                WorkoutService.setCheerEnabled(true);
+                if (WorkoutService.isPlaying()) {
+                    startActionPlay(null);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
