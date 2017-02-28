@@ -35,7 +35,7 @@ public class WorkoutService extends Service {
     protected int currentCheerPosition = 0;
     static protected boolean musicEnabled = false;
     static protected boolean cheerEnabled = false;
-    static protected boolean isPlaying = false;
+    static protected boolean isMusicPlaying = false;
 
     /*
     Life cycle
@@ -93,9 +93,13 @@ public class WorkoutService extends Service {
         }
         if (musicEnabled) {
             playMusic();
+            isMusicPlaying = true;
+        }
+        else {
+            pauseMusic();
+            isMusicPlaying = false;
         }
         startTimer();
-        isPlaying = true;
     }
 
     protected void startActionPause() {
@@ -105,7 +109,7 @@ public class WorkoutService extends Service {
         pauseMusic();
         endCheer();
         pauseTimer();
-        isPlaying = false;
+        isMusicPlaying = false;
     }
 
     protected void startActionNextPage() {
@@ -145,8 +149,12 @@ public class WorkoutService extends Service {
         cheerEnabled = enabled;
     }
 
-    static public boolean isPlaying() {
-        return isPlaying;
+    static public boolean isMusicPlaying() {
+        return isMusicPlaying;
+    }
+
+    static public boolean isCheerEnabled() {
+        return cheerEnabled;
     }
 
     /*
@@ -269,7 +277,7 @@ public class WorkoutService extends Service {
             @Override
             public void progress(int timer) {
                 updateForegroundNotification(timer);
-                if (cheerEnabled && (timer % 30 == 5)) {
+                if (cheerEnabled && (timer % 25 == 5)) {
                     nextCheer();
                 }
             }

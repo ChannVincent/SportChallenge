@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,7 +22,6 @@ import chann.vincent.sportchallenge.service.NotificationConstants;
 import chann.vincent.sportchallenge.service.WorkoutService;
 import chann.vincent.sportchallenge.service.WorkoutServiceListener;
 import fr.smartapps.smasupportv1.pager.SMAViewPager;
-import fr.smartapps.smasupportv1.pager.Transition;
 
 public class WorkoutActivity extends AppCompatActivity {
 
@@ -49,7 +47,7 @@ public class WorkoutActivity extends AppCompatActivity {
     }
 
     /*
-    Navigation bar
+    Navigation bar : titles & menus
      */
     protected void initNavigationBar() {
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -66,31 +64,66 @@ public class WorkoutActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.workout_menu, menu);
+        invalidateOptionsMenu();
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case android.R.id.home:
                 onBackPressed();
                 finish();
                 return true;
+
             case R.id.action_music:
-                WorkoutService.setMusicEnabled(true);
-                if (WorkoutService.isPlaying()) {
-                    startActionPlay(null);
+                if (WorkoutService.isMusicPlaying()) {
+                    WorkoutService.setMusicEnabled(false);
                 }
+                else {
+                    WorkoutService.setMusicEnabled(true);
+                }
+                startActionPlay(null);
+                invalidateOptionsMenu();
                 return true;
+
             case R.id.action_cheer:
-                WorkoutService.setCheerEnabled(true);
-                if (WorkoutService.isPlaying()) {
-                    startActionPlay(null);
+                if (WorkoutService.isCheerEnabled()) {
+                    WorkoutService.setCheerEnabled(false);
                 }
+                else {
+                    WorkoutService.setCheerEnabled(true);
+                }
+                startActionPlay(null);
+                invalidateOptionsMenu();
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // music
+        if (WorkoutService.isMusicPlaying()) {
+            menu.findItem(R.id.action_music).setIcon(getResources().getDrawable(R.drawable.ic_volume_up_white_24dp));
+        }
+        else {
+            menu.findItem(R.id.action_music).setIcon(getResources().getDrawable(R.drawable.ic_volume_off_white_24dp));
+        }
+
+        // cheer
+        if (WorkoutService.isCheerEnabled()) {
+            menu.findItem(R.id.action_cheer).setIcon(getResources().getDrawable(R.drawable.ic_sentiment_very_satisfied_white_24dp));
+        }
+        else {
+            menu.findItem(R.id.action_cheer).setIcon(getResources().getDrawable(R.drawable.ic_mood_bad_white_24dp));
+        }
+
+        // return updated menu after invalidateOptionsMenu();
+        return super.onPrepareOptionsMenu(menu);
     }
 
     /*
