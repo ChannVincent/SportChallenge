@@ -16,6 +16,7 @@ public class NotificationConstants {
         public static String PREVIOUS = "chann.vincent.sportchallenge.action.prev";
         public static String NEXT = "chann.vincent.sportchallenge.action.next";
         public static String PLAY = "chann.vincent.sportchallenge.action.play";
+        public static String UPDATE = "chann.vincent.sportchallenge.action.update";
         public static String PAUSE = "chann.vincent.sportchallenge.action.pause";
 
         public static String START_FOREGROUND = "chann.vincent.sportchallenge.action.startforeground";

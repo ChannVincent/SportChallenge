@@ -7,6 +7,7 @@ package chann.vincent.sportchallenge.service;
 public interface WorkoutServiceListener {
 
     public void play();
+    public void update();
     public void pause();
     public void next();
     public void previous();

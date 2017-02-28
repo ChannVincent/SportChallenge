@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v7.app.NotificationCompat;
+import android.text.format.Time;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -35,7 +36,7 @@ public class WorkoutService extends Service {
     protected int currentCheerPosition = 0;
     static protected boolean musicEnabled = false;
     static protected boolean cheerEnabled = false;
-    static protected boolean isMusicPlaying = false;
+    static protected boolean isTimerPlaying = false;
 
     /*
     Life cycle
@@ -74,6 +75,9 @@ public class WorkoutService extends Service {
             else if (action.equals(NotificationConstants.ACTION.PLAY)) {
                 startActionPlay();
             }
+            else if (action.equals(NotificationConstants.ACTION.UPDATE)) {
+                startActionUpdate();
+            }
             else if (action.equals(NotificationConstants.ACTION.PAUSE)) {
                 startActionPause();
             }
@@ -88,41 +92,75 @@ public class WorkoutService extends Service {
     Command actions
      */
     protected void startActionPlay() {
-        if (listener != null) {
-            listener.play();
-        }
+        // play music if music enabled
         if (musicEnabled) {
             playMusic();
-            isMusicPlaying = true;
         }
         else {
             pauseMusic();
-            isMusicPlaying = false;
         }
+
+        // start timer
         startTimer();
+        if (listener != null) {
+            listener.play();
+        }
     }
 
     protected void startActionPause() {
-        if (listener != null) {
-            listener.pause();
-        }
         pauseMusic();
         endCheer();
         pauseTimer();
-        isMusicPlaying = false;
+        if (listener != null) {
+            listener.pause();
+        }
+    }
+
+    protected void startActionUpdate() {
+        if (isMusicEnabled() && isTimerPlaying()) {
+            playMusic();
+        }
+        else {
+            pauseMusic();
+        }
+
+        if (isTimerPlaying()) {
+            startTimer();
+        }
+        else {
+            pauseTimer();
+        }
+
+        if (!isCheerEnabled()) {
+            endCheer();
+        }
+
+        if (listener != null) {
+            listener.update();
+        }
     }
 
     protected void startActionNextPage() {
         if (listener != null) {
+            if (isTimerPlaying()) {
+                restartTimer();
+            }
+            else {
+                resetTimer();
+            }
             listener.next();
-            restartTimer();
         }
     }
 
     protected void startActionPreviousPage() {
         if (listener != null) {
+            if (isTimerPlaying()) {
+                restartTimer();
+            }
+            else {
+                resetTimer();
+            }
             listener.previous();
-            restartTimer();
         }
     }
 
@@ -149,12 +187,16 @@ public class WorkoutService extends Service {
         cheerEnabled = enabled;
     }
 
-    static public boolean isMusicPlaying() {
-        return isMusicPlaying;
+    static public boolean isMusicEnabled() {
+        return musicEnabled;
     }
 
     static public boolean isCheerEnabled() {
         return cheerEnabled;
+    }
+
+    static public boolean isTimerPlaying() {
+        return isTimerPlaying;
     }
 
     /*
@@ -273,7 +315,7 @@ public class WorkoutService extends Service {
     Timer
      */
     protected void initTimer() {
-        timerManager = new TimerManager(45, this, new TimerListener() {
+        TimerListener timerListener = new TimerListener() {
             @Override
             public void progress(int timer) {
                 updateForegroundNotification(timer);
@@ -286,19 +328,28 @@ public class WorkoutService extends Service {
             public void onFinish() {
                 startActionNextPage();
             }
-        });
+        };
+        timerManager = new TimerManager(45, this, timerListener);
+        timerListener.progress(0);
     }
 
     protected void startTimer() {
         if (timerManager != null) {
+            isTimerPlaying = true;
             timerManager.start();
         }
     }
 
     protected void pauseTimer() {
         if (timerManager != null) {
+            isTimerPlaying = false;
             timerManager.pause();
         }
+    }
+
+    protected void resetTimer() {
+        pauseTimer();
+        initTimer();
     }
 
     protected void restartTimer() {

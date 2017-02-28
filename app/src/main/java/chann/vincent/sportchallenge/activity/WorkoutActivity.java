@@ -33,6 +33,7 @@ public class WorkoutActivity extends AppCompatActivity {
     protected SMAViewPager pager;
     protected ImageButton buttonPrevious;
     protected ImageButton buttonNext;
+    protected int currentPageSelected;
 
     /*
     Life cycle
@@ -78,13 +79,13 @@ public class WorkoutActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_music:
-                if (WorkoutService.isMusicPlaying()) {
+                if (WorkoutService.isMusicEnabled()) {
                     WorkoutService.setMusicEnabled(false);
                 }
                 else {
                     WorkoutService.setMusicEnabled(true);
                 }
-                startActionPlay(null);
+                startActionUpdate(null);
                 invalidateOptionsMenu();
                 return true;
 
@@ -95,7 +96,7 @@ public class WorkoutActivity extends AppCompatActivity {
                 else {
                     WorkoutService.setCheerEnabled(true);
                 }
-                startActionPlay(null);
+                startActionUpdate(null);
                 invalidateOptionsMenu();
                 return true;
 
@@ -107,7 +108,7 @@ public class WorkoutActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // music
-        if (WorkoutService.isMusicPlaying()) {
+        if (WorkoutService.isMusicEnabled()) {
             menu.findItem(R.id.action_music).setIcon(getResources().getDrawable(R.drawable.ic_volume_up_white_24dp));
         }
         else {
@@ -147,15 +148,8 @@ public class WorkoutActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 setNavigationBarTitles("title " + (position + 1), "subtitle " + (position + 1));
-                if (position == 0) {
-                    buttonPrevious.setVisibility(View.INVISIBLE);
-                    buttonNext.setVisibility(View.VISIBLE);
-                }
-
-                if (position == (pager.getChildCount() - 1)) {
-                    buttonPrevious.setVisibility(View.VISIBLE);
-                    buttonNext.setVisibility(View.INVISIBLE);
-                }
+                currentPageSelected = position;
+                updateState();
             }
 
             @Override
@@ -181,6 +175,24 @@ public class WorkoutActivity extends AppCompatActivity {
         }
     }
 
+    public void updateState() {
+        if (WorkoutService.isTimerPlaying()) {
+            buttonPrevious.setVisibility(View.INVISIBLE);
+            buttonNext.setVisibility(View.INVISIBLE);
+        }
+        else {
+            if (currentPageSelected == 0) {
+                buttonPrevious.setVisibility(View.INVISIBLE);
+                buttonNext.setVisibility(View.VISIBLE);
+            }
+
+            if (currentPageSelected == (pager.getChildCount() - 1)) {
+                buttonPrevious.setVisibility(View.VISIBLE);
+                buttonNext.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
     /*
     Start and bind to Workout Service
      */
@@ -201,12 +213,12 @@ public class WorkoutActivity extends AppCompatActivity {
                     workoutService.setListener(new WorkoutServiceListener() {
                         @Override
                         public void play() {
-                            Toast.makeText(getActivity(), "play", Toast.LENGTH_SHORT).show();
+                            updateState();
                         }
 
                         @Override
                         public void pause() {
-                            Toast.makeText(getActivity(), "pause", Toast.LENGTH_SHORT).show();
+                            updateState();
                         }
 
                         @Override
@@ -217,6 +229,11 @@ public class WorkoutActivity extends AppCompatActivity {
                         @Override
                         public void previous() {
                             previousPage();
+                        }
+
+                        @Override
+                        public void update() {
+
                         }
 
                         @Override
@@ -245,6 +262,12 @@ public class WorkoutActivity extends AppCompatActivity {
     public void startActionPlay(View view) {
         intentWorkoutService = new Intent(this, WorkoutService.class);
         intentWorkoutService.setAction(NotificationConstants.ACTION.PLAY);
+        startService(intentWorkoutService);
+    }
+
+    public void startActionUpdate(View view) {
+        intentWorkoutService = new Intent(this, WorkoutService.class);
+        intentWorkoutService.setAction(NotificationConstants.ACTION.UPDATE);
         startService(intentWorkoutService);
     }
 
