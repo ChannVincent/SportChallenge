@@ -1,61 +1,42 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/layout"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical"
-              android:padding="10dp"
-              android:background="#abcdef">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:background="@color/colorBackground">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#000000"
-        android:text="Custom Notification Title"/>
-
-    <TextView
-        android:id="@+id/text_timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#000000"
-        android:text="Timer ..."/>
-
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"/>
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorAccent"/>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/action_previous"
+        <TextView
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="previous"/>
+            android:textColor="@color/colorTitle"
+            android:text="Title ..."/>
 
-        <Button
-            android:id="@+id/action_next"
+        <TextView
+            android:id="@+id/text_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="next"/>
-
+            android:textColor="@color/colorSubtitle"
+            android:text="Timer ..."/>
 
         <Button
-            android:id="@+id/action_play"
+            android:id="@+id/action_finish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="play"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            android:text="finish"/>
 
         <Button
             android:id="@+id/action_pause"
@@ -63,11 +44,35 @@
             android:layout_height="wrap_content"
             android:text="pause"/>
 
-        <Button
-            android:id="@+id/action_finish"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="finish"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/colorAccent"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/action_previous"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="previous"/>
+
+            <Button
+                android:id="@+id/action_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="play"/>
+
+            <Button
+                android:id="@+id/action_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="next"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
