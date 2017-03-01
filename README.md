@@ -14,6 +14,8 @@ Follow our coach training with music and cheers.
 - SC-05 : audio enabled / disabled
 - SC-06 : foreground notification design
 - SC-07 : json data
+- SC-08 : workout list
+- SC-09 : download data 
 
 ## Demo
 
