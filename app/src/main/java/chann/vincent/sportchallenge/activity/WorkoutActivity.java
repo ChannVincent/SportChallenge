@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ public class WorkoutActivity extends AppCompatActivity {
     protected Intent intentWorkoutService = null;
     protected WorkoutActivity getActivity() { return this; }
     protected TextView timerTextView;
+    protected Button buttonPlay;
     protected CircularProgressBar timerProgressView;
     protected SMAViewPager pager;
     protected ImageButton buttonPrevious;
@@ -176,11 +178,35 @@ public class WorkoutActivity extends AppCompatActivity {
     }
 
     public void updateState() {
+        buttonPlay = (Button) findViewById(R.id.button_play);
+        timerTextView = (TextView) findViewById(R.id.text_timer);
+
+        // state play
         if (WorkoutService.isTimerPlaying()) {
+            buttonPlay.setBackground(null);
+            buttonPlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActionPause(null);
+                }
+            });
+            timerTextView.setVisibility(View.VISIBLE);
+
             buttonPrevious.setVisibility(View.INVISIBLE);
             buttonNext.setVisibility(View.INVISIBLE);
         }
+
+        // state pause
         else {
+            buttonPlay.setBackground(getResources().getDrawable(R.drawable.ic_play_arrow_white_24dp));
+            buttonPlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActionPlay(null);
+                }
+            });
+            timerTextView.setVisibility(View.GONE);
+
             if (currentPageSelected == 0) {
                 buttonPrevious.setVisibility(View.INVISIBLE);
                 buttonNext.setVisibility(View.VISIBLE);
