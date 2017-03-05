@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.support.v7.app.NotificationCompat;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import java.util.ArrayList;
@@ -111,6 +112,9 @@ public class WorkoutService extends Service {
         pauseMusic();
         endCheer();
         pauseTimer();
+        if (timerManager != null) {
+            updateForegroundNotification(timerManager.getTime());
+        }
         if (listener != null) {
             listener.pause();
         }
@@ -221,6 +225,15 @@ public class WorkoutService extends Service {
         notificationBigView.setOnClickPendingIntent(R.id.action_play, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PLAY));
         notificationBigView.setOnClickPendingIntent(R.id.action_pause, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PAUSE));
         notificationBigView.setOnClickPendingIntent(R.id.action_finish, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.STOP_FOREGROUND));
+
+        if (isTimerPlaying()) {
+            notificationBigView.setViewVisibility(R.id.action_play, View.GONE);
+            notificationBigView.setViewVisibility(R.id.action_pause, View.VISIBLE);
+        }
+        else {
+            notificationBigView.setViewVisibility(R.id.action_play, View.VISIBLE);
+            notificationBigView.setViewVisibility(R.id.action_pause, View.GONE);
+        }
 
         // create notification
         Notification notification = new NotificationCompat.Builder(this)

@@ -41,6 +41,10 @@ public class TimerManager {
         handler.removeCallbacks(runnable);
     }
 
+    public int getTime() {
+        return timerCount;
+    }
+
     public int getMaxTimer() {
         return timerCountMax;
     }
