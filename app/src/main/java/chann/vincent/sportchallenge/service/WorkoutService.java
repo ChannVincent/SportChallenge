@@ -35,6 +35,8 @@ public class WorkoutService extends Service {
     protected TimerManager timerManager;
     protected List<String> audioFileList = new ArrayList<>();
     protected int currentCheerPosition = 0;
+    static protected int currentPageSelected = 0;
+    static protected String currentTitle = "Custom title";
     static protected boolean musicEnabled = false;
     static protected boolean cheerEnabled = false;
     static protected boolean isTimerPlaying = false;
@@ -65,7 +67,7 @@ public class WorkoutService extends Service {
         Log.e(TAG, "onStartCommand() - action : " + action);
         if (action != null) {
             if (action.equals(NotificationConstants.ACTION.START_FOREGROUND)) {
-                showForegroundNotification(0);
+                showForegroundNotification(0, currentTitle);
             }
             else if (action.equals(NotificationConstants.ACTION.PREVIOUS)) {
                 startActionPreviousPage();
@@ -85,6 +87,23 @@ public class WorkoutService extends Service {
             else if (action.equals(NotificationConstants.ACTION.STOP_FOREGROUND)) {
                 startActionFinish();
             }
+            else if (action.equals(NotificationConstants.ACTION.MUSIC)) {
+                if (isMusicEnabled()) {
+                    startActionMusic(false);
+                }
+                else {
+                    startActionMusic(true);
+                }
+            }
+            else if (action.equals(NotificationConstants.ACTION.CHEER)) {
+                if (isCheerEnabled()) {
+                    startActionCheer(false);
+                }
+                else {
+                    startActionCheer(true);
+                }
+            }
+
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -92,6 +111,16 @@ public class WorkoutService extends Service {
     /*
     Command actions
      */
+    protected void startActionMusic(boolean enabled) {
+        setMusicEnabled(enabled);
+        startActionUpdate();
+    }
+
+    protected void startActionCheer(boolean enabled) {
+        setCheerEnabled(enabled);
+        startActionUpdate();
+    }
+
     protected void startActionPlay() {
         // play music if music enabled
         if (musicEnabled) {
@@ -113,7 +142,7 @@ public class WorkoutService extends Service {
         endCheer();
         pauseTimer();
         if (timerManager != null) {
-            updateForegroundNotification(timerManager.getTime());
+            updateForegroundNotification(timerManager.getTime(), currentTitle);
         }
         if (listener != null) {
             listener.pause();
@@ -145,6 +174,7 @@ public class WorkoutService extends Service {
     }
 
     protected void startActionNextPage() {
+        currentPageSelected++;
         if (listener != null) {
             if (isTimerPlaying()) {
                 restartTimer();
@@ -157,6 +187,7 @@ public class WorkoutService extends Service {
     }
 
     protected void startActionPreviousPage() {
+        currentPageSelected--;
         if (listener != null) {
             if (isTimerPlaying()) {
                 restartTimer();
@@ -203,21 +234,30 @@ public class WorkoutService extends Service {
         return isTimerPlaying;
     }
 
+    static public int getCurrentPageSelected() {
+        return currentPageSelected;
+    }
+
+    static public int getPageCount() {
+        return 2;
+    }
+
     /*
     Foreground notification
      */
-    protected void updateForegroundNotification(int timer) {
+    protected void updateForegroundNotification(int timer, String title) {
         if (listener != null) {
             listener.timer(timer, timerManager.getMaxTimer());
         }
-        showForegroundNotification(timer);
+        showForegroundNotification(timer, title);
     }
 
-    protected void showForegroundNotification(int timer) {
+    protected void showForegroundNotification(int timer, String title) {
         // remote views
         RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification);
         RemoteViews notificationBigView = new RemoteViews(this.getPackageName(), R.layout.notification_big);
-        notificationBigView.setTextViewText(R.id.text_timer, "timer : " + timer);
+        notificationBigView.setTextViewText(R.id.text_timer, "Timer : " + timer + " / " + timerManager.getMaxTimer());
+        notificationBigView.setTextViewText(R.id.title, title);
 
         // actions
         notificationBigView.setOnClickPendingIntent(R.id.action_previous, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PREVIOUS));
@@ -225,7 +265,12 @@ public class WorkoutService extends Service {
         notificationBigView.setOnClickPendingIntent(R.id.action_play, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PLAY));
         notificationBigView.setOnClickPendingIntent(R.id.action_pause, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.PAUSE));
         notificationBigView.setOnClickPendingIntent(R.id.action_finish, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.STOP_FOREGROUND));
+        notificationBigView.setOnClickPendingIntent(R.id.action_music_enabled, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.MUSIC));
+        notificationBigView.setOnClickPendingIntent(R.id.action_music_disabled, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.MUSIC));
+        notificationBigView.setOnClickPendingIntent(R.id.action_cheer_enabled, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.CHEER));
+        notificationBigView.setOnClickPendingIntent(R.id.action_cheer_disabled, NotificationConstants.getCustomPendingIntent(this, NotificationConstants.ACTION.CHEER));
 
+        // switch play / pause
         if (isTimerPlaying()) {
             notificationBigView.setViewVisibility(R.id.action_play, View.GONE);
             notificationBigView.setViewVisibility(R.id.action_pause, View.VISIBLE);
@@ -233,6 +278,40 @@ public class WorkoutService extends Service {
         else {
             notificationBigView.setViewVisibility(R.id.action_play, View.VISIBLE);
             notificationBigView.setViewVisibility(R.id.action_pause, View.GONE);
+        }
+
+        // visibility next / previous
+        if (getCurrentPageSelected() <= 0) {
+            notificationBigView.setViewVisibility(R.id.action_previous, View.INVISIBLE);
+            notificationBigView.setViewVisibility(R.id.action_next, View.VISIBLE);
+        }
+        else if (getCurrentPageSelected() >= getPageCount() - 1) {
+            notificationBigView.setViewVisibility(R.id.action_previous, View.VISIBLE);
+            notificationBigView.setViewVisibility(R.id.action_next, View.INVISIBLE);
+        }
+        else {
+            notificationBigView.setViewVisibility(R.id.action_previous, View.VISIBLE);
+            notificationBigView.setViewVisibility(R.id.action_next, View.VISIBLE);
+        }
+
+        // switch music enabled
+        if (isMusicEnabled()) {
+            notificationBigView.setViewVisibility(R.id.action_music_enabled, View.VISIBLE);
+            notificationBigView.setViewVisibility(R.id.action_music_disabled, View.GONE);
+        }
+        else {
+            notificationBigView.setViewVisibility(R.id.action_music_enabled, View.GONE);
+            notificationBigView.setViewVisibility(R.id.action_music_disabled, View.VISIBLE);
+        }
+
+        // switch cheer enabled
+        if (isCheerEnabled()) {
+            notificationBigView.setViewVisibility(R.id.action_cheer_enabled, View.VISIBLE);
+            notificationBigView.setViewVisibility(R.id.action_cheer_disabled, View.GONE);
+        }
+        else {
+            notificationBigView.setViewVisibility(R.id.action_cheer_enabled, View.GONE);
+            notificationBigView.setViewVisibility(R.id.action_cheer_disabled, View.VISIBLE);
         }
 
         // create notification
@@ -244,20 +323,6 @@ public class WorkoutService extends Service {
 
         // show notification
         startForeground(NotificationConstants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification);
-
-        /*
-        // glide image loading into notification
-        // TODO https://futurestud.io/tutorials/glide-loading-images-into-notifications-and-appwidgets
-        NotificationTarget notificationTarget = new NotificationTarget(this,
-                notificationBigView,
-                R.id.image,
-                notification,
-                NotificationConstants.NOTIFICATION_ID.FOREGROUND_SERVICE);
-        Glide.with(this.getApplicationContext()) // safer!
-                .load(new SMAFile("gif/power_jump.gif", assetManager))
-                .asBitmap()
-                .into(notificationTarget);
-                */
     }
 
     /*
@@ -331,7 +396,7 @@ public class WorkoutService extends Service {
         TimerListener timerListener = new TimerListener() {
             @Override
             public void progress(int timer) {
-                updateForegroundNotification(timer);
+                updateForegroundNotification(timer, currentTitle);
                 if (cheerEnabled && (timer % 25 == 5)) {
                     nextCheer();
                 }

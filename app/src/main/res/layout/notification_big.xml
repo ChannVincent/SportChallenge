@@ -6,11 +6,11 @@
     android:padding="10dp"
     android:background="@color/colorBackground">
 
-    <Button
+    <ImageButton
         android:id="@+id/action_finish"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="X"
+        android:src="@drawable/ic_clear_white_24dp"
         android:layout_gravity="top|right"/>
 
     <LinearLayout
@@ -18,26 +18,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@color/colorAccent"/>
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:src="@mipmap/ic_launcher"/>
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorTitle"
-            android:text="Title ..."/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
 
-        <TextView
-            android:id="@+id/text_timer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorSubtitle"
-            android:text="Timer ..."/>
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorTitle"
+                    android:text="Title ..."/>
+
+                <TextView
+                    android:id="@+id/text_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorSubtitle"
+                    android:text="Timer ..."/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,30 +64,59 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <Button
+            <ImageButton
+                android:id="@+id/action_music_enabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_volume_up_white_24dp"/>
+
+            <ImageButton
+                android:id="@+id/action_music_disabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_volume_off_white_24dp"/>
+
+            <ImageButton
+                android:id="@+id/action_cheer_enabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_sentiment_very_satisfied_white_24dp"/>
+
+            <ImageButton
+                android:id="@+id/action_cheer_disabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_mood_bad_white_24dp"/>
+
+            <LinearLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+
+            <ImageButton
                 android:id="@+id/action_previous"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="previous"/>
+                android:src="@drawable/ic_skip_previous_white_24dp"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/action_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="play"/>
+                android:src="@drawable/ic_play_arrow_white_24dp"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/action_pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:text="pause"/>
+                android:src="@drawable/ic_pause_white_24dp"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/action_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="next"/>
+                android:src="@drawable/ic_skip_next_white_24dp"/>
 
         </LinearLayout>
 

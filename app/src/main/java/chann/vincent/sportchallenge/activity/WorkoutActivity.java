@@ -35,7 +35,6 @@ public class WorkoutActivity extends AppCompatActivity {
     protected SMAViewPager pager;
     protected ImageButton buttonPrevious;
     protected ImageButton buttonNext;
-    protected int currentPageSelected;
 
     /*
     Life cycle
@@ -149,8 +148,7 @@ public class WorkoutActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                setNavigationBarTitles("title " + (position + 1), "subtitle " + (position + 1));
-                currentPageSelected = position;
+                setNavigationBarTitles("title " + (WorkoutService.getCurrentPageSelected() + 1), "subtitle " + (WorkoutService.getCurrentPageSelected() + 1));
                 updateState();
             }
 
@@ -207,12 +205,12 @@ public class WorkoutActivity extends AppCompatActivity {
             });
             timerTextView.setVisibility(View.GONE);
 
-            if (currentPageSelected == 0) {
+            if (WorkoutService.getCurrentPageSelected() == 0) {
                 buttonPrevious.setVisibility(View.INVISIBLE);
                 buttonNext.setVisibility(View.VISIBLE);
             }
 
-            if (currentPageSelected == (pager.getChildCount() - 1)) {
+            if (WorkoutService.getCurrentPageSelected() == (pager.getChildCount() - 1)) {
                 buttonPrevious.setVisibility(View.VISIBLE);
                 buttonNext.setVisibility(View.INVISIBLE);
             }
