@@ -27,15 +27,27 @@ public class WorkoutFragment extends Fragment {
 
     protected String title;
     protected String gifUrl;
+    protected boolean paused;
     protected SMAAssetManager assetManager;
     static final protected String EXTRA_TITLE = "title";
     static final protected String EXTRA_GIF_URL = "gif_url";
+    static final protected String EXTRA_PAUSED = "paused";
 
     static public WorkoutFragment newInstance(String title, String gifUrl) {
         WorkoutFragment newInstance = new WorkoutFragment();
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_TITLE, title);
         bundle.putString(EXTRA_GIF_URL, gifUrl);
+        newInstance.setArguments(bundle);
+        return newInstance;
+    }
+
+    static public WorkoutFragment newInstance(String title, String gifUrl, boolean paused) {
+        WorkoutFragment newInstance = new WorkoutFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(EXTRA_TITLE, title);
+        bundle.putString(EXTRA_GIF_URL, gifUrl);
+        bundle.putBoolean(EXTRA_PAUSED, paused);
         newInstance.setArguments(bundle);
         return newInstance;
     }
@@ -54,6 +66,7 @@ public class WorkoutFragment extends Fragment {
         if (bundle != null) {
             this.title = bundle.getString(EXTRA_TITLE);
             this.gifUrl = bundle.getString(EXTRA_GIF_URL);
+            this.paused = bundle.getBoolean(EXTRA_PAUSED);
         }
     }
 
@@ -67,10 +80,17 @@ public class WorkoutFragment extends Fragment {
         assetManager.setDefaultStorageType(SMAAssetManager.STORAGE_TYPE_ASSETS);
         assetManager.setExtensionDirectory("shaun_t/gif/");
 
-        Glide.with(this)
-                .load(new SMAFile(this.gifUrl, assetManager))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(this.imageView);
+        if (!paused) {
+            Glide.with(this).load(new SMAFile(this.gifUrl, assetManager))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(this.imageView);
+        }
+        else {
+            Glide.with(this).load(new SMAFile(this.gifUrl, assetManager))
+                    .asBitmap()
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(this.imageView);
+        }
     }
 
     protected void initTitle() {

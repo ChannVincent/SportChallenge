@@ -1,11 +1,11 @@
 package chann.vincent.sportchallenge.activity;
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
@@ -22,7 +21,6 @@ import chann.vincent.sportchallenge.fragment.WorkoutFragment;
 import chann.vincent.sportchallenge.service.NotificationConstants;
 import chann.vincent.sportchallenge.service.WorkoutService;
 import chann.vincent.sportchallenge.service.WorkoutServiceListener;
-import fr.smartapps.smasupportv1.pager.SMAViewPager;
 
 public class WorkoutActivity extends AppCompatActivity {
 
@@ -32,7 +30,6 @@ public class WorkoutActivity extends AppCompatActivity {
     protected TextView timerTextView;
     protected Button buttonPlay;
     protected CircularProgressBar timerProgressView;
-    protected SMAViewPager pager;
     protected ImageButton buttonPrevious;
     protected ImageButton buttonNext;
 
@@ -120,48 +117,40 @@ public class WorkoutActivity extends AppCompatActivity {
     protected void initViewPager() {
         buttonPrevious = (ImageButton) findViewById(R.id.button_previous);
         buttonNext = (ImageButton) findViewById(R.id.button_next);
-        pager = (SMAViewPager) findViewById(R.id.workout_pager);
-        pager.fragmentManager(getFragmentManager())
-                .setFragments(WorkoutFragment.newInstance("TITLE 1", "power_jump.gif"), WorkoutFragment.newInstance("TITLE 2", "power_jacks.gif"))
-                .pageBoundaries(20, 20)
-                .swipeable(false)
-                .create();
-        ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                setNavigationBarTitles("title " + (WorkoutService.getCurrentPageSelected() + 1), "subtitle " + (WorkoutService.getCurrentPageSelected() + 1));
-                updateState();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        };
-        pager.setOnPageChangeListener(onPageChangeListener);
-
-        // select first page at start
-        onPageChangeListener.onPageSelected(0);
+        // TODO set from service
+        nextPage();
     }
 
     public void nextPage() {
-        if (pager != null && pager.getCurrentItem() < pager.getChildCount()) {
-            pager.setCurrentItem(pager.getCurrentItem() + 1);
-        }
+        // TODO add object with title, subtitle, gif, baseUrl as parameter
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left);
+        fragmentTransaction.replace(R.id.workout_layout, WorkoutFragment.newInstance("TITLE 1", "power_jump.gif", !WorkoutService.isTimerPlaying()));
+        fragmentTransaction.commitAllowingStateLoss(); // keep this fragment after rotation
+
+        setNavigationBarTitles("title " + (WorkoutService.getCurrentPageSelected() + 1), "subtitle " + (WorkoutService.getCurrentPageSelected() + 1));
+        updateButtonState();
     }
 
     public void previousPage() {
-        if (pager != null && pager.getCurrentItem() > 0) {
-            pager.setCurrentItem(pager.getCurrentItem() - 1);
-        }
+        // TODO add object with title, subtitle, gif, baseUrl as parameter
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right);
+        fragmentTransaction.replace(R.id.workout_layout, WorkoutFragment.newInstance("TITLE 1", "power_jump.gif", !WorkoutService.isTimerPlaying()));
+        fragmentTransaction.commitAllowingStateLoss(); // keep this fragment after rotation
+
+        setNavigationBarTitles("title " + (WorkoutService.getCurrentPageSelected() + 1), "subtitle " + (WorkoutService.getCurrentPageSelected() + 1));
+        updateButtonState();
     }
 
-    public void updateState() {
+    public void updatePageState() {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(0, 0);
+        fragmentTransaction.replace(R.id.workout_layout, WorkoutFragment.newInstance("TITLE 1", "power_jump.gif", !WorkoutService.isTimerPlaying()));
+        fragmentTransaction.commitAllowingStateLoss(); // keep this fragment after rotation
+    }
+
+    public void updateButtonState() {
         buttonPlay = (Button) findViewById(R.id.button_play);
         timerTextView = (TextView) findViewById(R.id.text_timer);
 
@@ -196,7 +185,7 @@ public class WorkoutActivity extends AppCompatActivity {
                 buttonNext.setVisibility(View.VISIBLE);
             }
 
-            if (WorkoutService.getCurrentPageSelected() == (pager.getChildCount() - 1)) {
+            if (WorkoutService.getCurrentPageSelected() == WorkoutService.getPageCount() - 1) {
                 buttonPrevious.setVisibility(View.VISIBLE);
                 buttonNext.setVisibility(View.INVISIBLE);
             }
@@ -223,12 +212,14 @@ public class WorkoutActivity extends AppCompatActivity {
                     workoutService.setListener(new WorkoutServiceListener() {
                         @Override
                         public void play() {
-                            updateState();
+                            updateButtonState();
+                            updatePageState();
                         }
 
                         @Override
                         public void pause() {
-                            updateState();
+                            updateButtonState();
+                            updatePageState();
                         }
 
                         @Override
