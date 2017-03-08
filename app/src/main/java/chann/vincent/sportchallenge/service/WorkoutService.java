@@ -114,11 +114,17 @@ public class WorkoutService extends Service {
     protected void startActionMusic(boolean enabled) {
         setMusicEnabled(enabled);
         startActionUpdate();
+        if (listener != null) {
+            listener.music(enabled);
+        }
     }
 
     protected void startActionCheer(boolean enabled) {
         setCheerEnabled(enabled);
         startActionUpdate();
+        if (listener != null) {
+            listener.cheer(enabled);
+        }
     }
 
     protected void startActionPlay() {

@@ -80,25 +80,11 @@ public class WorkoutActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_music:
-                if (WorkoutService.isMusicEnabled()) {
-                    WorkoutService.setMusicEnabled(false);
-                }
-                else {
-                    WorkoutService.setMusicEnabled(true);
-                }
-                startActionUpdate(null);
-                invalidateOptionsMenu();
+                startActionMusic(null);
                 return true;
 
             case R.id.action_cheer:
-                if (WorkoutService.isCheerEnabled()) {
-                    WorkoutService.setCheerEnabled(false);
-                }
-                else {
-                    WorkoutService.setCheerEnabled(true);
-                }
-                startActionUpdate(null);
-                invalidateOptionsMenu();
+                startActionCheer(null);
                 return true;
 
             default:
@@ -256,6 +242,16 @@ public class WorkoutActivity extends AppCompatActivity {
                         }
 
                         @Override
+                        public void music(boolean enabled) {
+                            invalidateOptionsMenu();
+                        }
+
+                        @Override
+                        public void cheer(boolean enabled) {
+                            invalidateOptionsMenu();
+                        }
+
+                        @Override
                         public void update() {
 
                         }
@@ -310,6 +306,18 @@ public class WorkoutActivity extends AppCompatActivity {
     public void startActionPreviousPage(View view) {
         intentWorkoutService = new Intent(this, WorkoutService.class);
         intentWorkoutService.setAction(NotificationConstants.ACTION.PREVIOUS);
+        startService(intentWorkoutService);
+    }
+
+    public void startActionMusic(View view) {
+        intentWorkoutService = new Intent(this, WorkoutService.class);
+        intentWorkoutService.setAction(NotificationConstants.ACTION.MUSIC);
+        startService(intentWorkoutService);
+    }
+
+    public void startActionCheer(View view) {
+        intentWorkoutService = new Intent(this, WorkoutService.class);
+        intentWorkoutService.setAction(NotificationConstants.ACTION.CHEER);
         startService(intentWorkoutService);
     }
 
